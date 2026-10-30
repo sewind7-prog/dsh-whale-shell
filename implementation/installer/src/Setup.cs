@@ -12,7 +12,7 @@ using System.Web.Script.Serialization;
 using System.Windows.Forms;
 
 internal static class Program {
- internal const string Version="1.0.2";
+ internal const string Version="1.0.3";
  internal const string PayloadHash="__PAYLOAD_SHA256__";
  internal static readonly JavaScriptSerializer Json=new JavaScriptSerializer {MaxJsonLength=16000000};
  [STAThread] public static int Main(string[] args) {
@@ -31,6 +31,13 @@ internal static class Program {
  internal static string Get(Dictionary<string,object>d,string key){return d.ContainsKey(key)&&d[key]!=null?Convert.ToString(d[key]):null;}
  internal static void Write(string p,object value){Directory.CreateDirectory(Path.GetDirectoryName(p));File.WriteAllText(p,Json.Serialize(value),new UTF8Encoding(false));}
  internal static Icon LoadWhaleIcon(){using(var stream=System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("WhaleIcon")){if(stream==null)throw new Exception("鲸鱼图标资源缺失，请重新获取完整安装器。");using(var image=new Icon(stream))return (Icon)image.Clone();}}
+ internal static void VerifyIdentity(string appDir,string runtime){
+  List<Dictionary<string,object>> supported;using(var stream=System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("SupportedShells")){if(stream==null)throw new Exception("支持版本清单缺失。");using(var reader=new StreamReader(stream,Encoding.UTF8))supported=Json.Deserialize<List<Dictionary<string,object>>>(reader.ReadToEnd());}
+  var asar=Path.Combine(appDir,"resources","app.asar");var exe=Path.Combine(appDir,"DeepSeek Harness.exe");if(!File.Exists(asar)||!File.Exists(exe)||!File.Exists(runtime))throw new Exception("DSH 程序或测试运行时文件缺失。");
+  var asarHash=Hash(asar);var identity=supported.FirstOrDefault(row=>Get(row,"stock")==asarHash||Get(row,"whale")==asarHash);
+  if(identity==null||Hash(exe)!=Get(identity,"exe"))throw new Exception("DSH 程序与外壳散列不匹配：仅支持已核验的 Windows x64 0.2.1-rc.3 / rc.5。其他版本或修改版未被覆盖。");
+  var runtimeHash=String.Equals(exe,runtime,StringComparison.OrdinalIgnoreCase)?Get(identity,"exe"):Hash(runtime);if(!supported.Any(row=>Get(row,"exe")==runtimeHash))throw new Exception("测试运行时不在已核验的 DSH 白名单中，未启动程序。");
+ }
 }
 internal sealed class Options {
  internal string AppDir,Home,Runtime,Command,Result;internal bool Fixture;
@@ -47,11 +54,12 @@ internal sealed class Installer {
  private readonly Options o;private readonly Action<string> log;private string payload,root;
  internal Installer(Options options,Action<string> logger){o=options;log=logger;root=Path.Combine(o.Home,"whale-shell-installer");}
  internal static string ExtractPayload(){
-  var cache=Path.Combine(Path.GetTempPath(),"DSHWhaleInstaller",Program.Version+"-"+Program.PayloadHash.Substring(0,12));var zip=cache+".zip";
-  Directory.CreateDirectory(Path.GetDirectoryName(cache));
-  if(!File.Exists(zip)||Program.Hash(zip)!=Program.PayloadHash){using(var input=System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("WhalePayload")){if(input==null)throw new Exception("安装资源缺失。");using(var output=File.Create(zip))input.CopyTo(output);}if(Program.Hash(zip)!=Program.PayloadHash)throw new Exception("安装包完整性校验失败。");}
-  cache=cache+"-"+Guid.NewGuid().ToString("N");Directory.CreateDirectory(cache);var prefix=Path.GetFullPath(cache)+Path.DirectorySeparatorChar;
-  using(var archive=ZipFile.OpenRead(zip)){foreach(var e in archive.Entries){var p=Path.GetFullPath(Path.Combine(cache,e.FullName));if(!p.StartsWith(prefix,StringComparison.OrdinalIgnoreCase))throw new Exception("安装资源路径不安全。");if(String.IsNullOrEmpty(e.Name)){Directory.CreateDirectory(p);continue;}Directory.CreateDirectory(Path.GetDirectoryName(p));using(var input=e.Open())using(var output=File.Create(p))input.CopyTo(output);}}
+  var cache=Path.Combine(Path.GetTempPath(),"DSHWhaleInstaller",Program.Version+"-"+Program.PayloadHash.Substring(0,12)+"-"+Guid.NewGuid().ToString("N"));
+  using(var input=System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("WhalePayload")){
+   if(input==null)throw new Exception("安装资源缺失。");using(var hash=SHA256.Create()){if(BitConverter.ToString(hash.ComputeHash(input)).Replace("-","").ToLowerInvariant()!=Program.PayloadHash)throw new Exception("安装包完整性校验失败。");}input.Position=0;
+   Directory.CreateDirectory(cache);var prefix=Path.GetFullPath(cache)+Path.DirectorySeparatorChar;
+   using(var archive=new ZipArchive(input,ZipArchiveMode.Read)){foreach(var e in archive.Entries){var p=Path.GetFullPath(Path.Combine(cache,e.FullName));if(!p.StartsWith(prefix,StringComparison.OrdinalIgnoreCase))throw new Exception("安装资源路径不安全。");if(String.IsNullOrEmpty(e.Name)){Directory.CreateDirectory(p);continue;}Directory.CreateDirectory(Path.GetDirectoryName(p));using(var entry=e.Open())using(var output=File.Create(p))entry.CopyTo(output);}}
+  }
   return cache;
  }
  private void CheckClosed(){
@@ -61,8 +69,9 @@ internal sealed class Installer {
  }
  private void CheckSpace(){var appDrive=new DriveInfo(Path.GetPathRoot(o.AppDir));var homeDrive=new DriveInfo(Path.GetPathRoot(o.Home));long need=appDrive.Name==homeDrive.Name?700L*1024*1024:256L*1024*1024;if(appDrive.AvailableFreeSpace<need||homeDrive.AvailableFreeSpace<512L*1024*1024)throw new Exception("备份与安装需要约 700 MB 可用空间，请清出空间后重试。");}
  private Dictionary<string,object> Run(string action,string receipt){
+  Program.VerifyIdentity(o.AppDir,o.Runtime);
   var config=Path.Combine(root,"launcher-"+Guid.NewGuid().ToString("N")+".json");Directory.CreateDirectory(root);Program.Write(config,new{appDir=o.AppDir,dataHome=o.Home,payloadDir=payload,action=action,receipt=receipt});
-  Dictionary<string,object> result=null;string error=null;var stderr=new StringBuilder();var info=new ProcessStartInfo(o.Runtime,"--expose-internals "+Program.Quote(Path.Combine(payload,"engine.cjs"))+" "+Program.Quote(config)){UseShellExecute=false,CreateNoWindow=true,RedirectStandardOutput=true,RedirectStandardError=true,StandardOutputEncoding=Encoding.UTF8,StandardErrorEncoding=Encoding.UTF8};info.EnvironmentVariables["ELECTRON_RUN_AS_NODE"]="1";info.EnvironmentVariables.Remove("ELECTRON_NO_ASAR");
+  Dictionary<string,object> result=null;string error=null;var stderr=new StringBuilder();var info=new ProcessStartInfo(o.Runtime,"--expose-internals "+Program.Quote(Path.Combine(payload,"engine.cjs"))+" "+Program.Quote(config)){UseShellExecute=false,CreateNoWindow=true,RedirectStandardOutput=true,RedirectStandardError=true,StandardOutputEncoding=Encoding.UTF8,StandardErrorEncoding=Encoding.UTF8,WorkingDirectory=root};info.EnvironmentVariables["ELECTRON_RUN_AS_NODE"]="1";info.EnvironmentVariables.Remove("ELECTRON_NO_ASAR");info.EnvironmentVariables.Remove("NODE_OPTIONS");info.EnvironmentVariables.Remove("NODE_PATH");
   try{using(var process=new Process()){process.StartInfo=info;process.OutputDataReceived+=(s,e)=>{if(e.Data==null)return;try{var item=Program.Json.Deserialize<Dictionary<string,object>>(e.Data);var type=Program.Get(item,"type");if(type=="progress")log(Program.Get(item,"message"));else if(type=="error")error=Program.Get(item,"message");else if(type=="result")result=item;}catch{}};process.ErrorDataReceived+=(s,e)=>{if(e.Data!=null&&stderr.Length<4000)stderr.AppendLine(e.Data);};process.Start();process.BeginOutputReadLine();process.BeginErrorReadLine();process.WaitForExit();if(process.ExitCode!=0)throw new Exception(error??("安装组件运行失败："+stderr.ToString()));return result;}}finally{if(File.Exists(config))File.Delete(config);}
  }
  private void Swap(Dictionary<string,object> receipt,bool rollback){
@@ -73,7 +82,7 @@ internal sealed class Installer {
  private bool Committed(string receiptPath){var state=Path.Combine(root,"install-state.json");return File.Exists(state)&&Program.Get(Program.Read(state),"latest")==receiptPath;}
  private void Recover(){var pending=Path.Combine(root,"pending.json");if(!File.Exists(pending)){log("没有未完成的安装。");return;}var pointer=Program.Read(pending);var receiptPath=Program.Get(pointer,"receipt");var safeRoot=Path.GetFullPath(Path.Combine(root,"backups"))+Path.DirectorySeparatorChar;if(!Path.GetFullPath(receiptPath).StartsWith(safeRoot,StringComparison.OrdinalIgnoreCase))throw new Exception("恢复记录路径无效。");var receipt=Program.Read(receiptPath);if(Program.Get(receipt,"appDir")!=o.AppDir||Program.Get(receipt,"dataHome")!=o.Home)throw new Exception("恢复记录与当前目录不符。");if(Committed(receiptPath)){CheckClosed();Run("finalize",receiptPath);log("上次文件写入已完成，现已补齐完成记录。");return;}log("正在恢复上次未完成的安装……");Run("rollback",receiptPath);Swap(receipt,true);Run("clear-pending",null);log("已恢复到上次安装前状态。");}
  internal object Execute(string command){
-  if(command!="install"&&command!="restore"&&command!="recover")throw new Exception("未知安装操作。");CheckClosed();CheckSpace();payload=ExtractPayload();log("数据目录："+o.Home);if(command=="recover"){Recover();return new{ok=true,action=command};}
+  if(command!="install"&&command!="restore"&&command!="recover")throw new Exception("未知安装操作。");CheckClosed();Program.VerifyIdentity(o.AppDir,o.Runtime);CheckSpace();payload=ExtractPayload();log("数据目录："+o.Home);if(command=="recover"){Recover();return new{ok=true,action=command};}
   if(File.Exists(Path.Combine(root,"pending.json")))Recover();
   log(command=="restore"?"正在准备还原安装前外壳……":"正在检查资源、现有插件与头像库……");var receipt=Run(command=="restore"?"prepare-restore":"prepare",null);if(receipt==null)throw new Exception("安装组件未返回准备结果。");var receiptPath=Program.Get(receipt,"receipt");
   try{Swap(receipt,false);CheckClosed();Run("apply",receiptPath);CheckClosed();Run("finalize",receiptPath);}catch(Exception original){if(Committed(receiptPath)){try{CheckClosed();Run("finalize",receiptPath);}catch(Exception completion){throw new Exception("文件写入已完成，但完成记录未补齐："+completion.Message+"\r\n请再次运行本安装器，使用“修复未完成安装”。");}}else{try{CheckClosed();Run("rollback",receiptPath);Swap(receipt,true);Run("clear-pending",null);}catch(Exception recovery){throw new Exception(original.Message+"\r\n自动回退未完成："+recovery.Message+"\r\n请再次运行本安装器，使用“修复未完成安装”。");}throw new Exception(original.Message+"\r\n已回退本次修改，原文件和备份均保留。");}}
@@ -89,7 +98,7 @@ internal sealed class MainForm:Form {
   Controls.Add(new Label{Text="鲸鱼外壳 · DS Bot 0.2.4 · 36 个拼贴头像\r\n离线安装，自动备份，保留账号、设置和聊天数据。",Location=new Point(28,76),Size=new Size(590,48)});
   Controls.Add(new Label{Text=o.Fixture?"独立测试目录（不会安装到当前客户端）":"DSH 安装文件夹",Location=new Point(28,138),AutoSize=true});
   pathBox=new TextBox{Text=o.AppDir??"",Location=new Point(28,162),Size=new Size(494,26),ReadOnly=o.Fixture};Controls.Add(pathBox);browse=new Button{Text="选择文件夹",Location=new Point(532,159),Size=new Size(90,30),Enabled=!o.Fixture};browse.Click+=(s,e)=>{using(var dialog=new FolderBrowserDialog()){dialog.Description="选择包含 DeepSeek Harness.exe 的安装文件夹";if(dialog.ShowDialog()==DialogResult.OK)pathBox.Text=dialog.SelectedPath;}};Controls.Add(browse);
-  Controls.Add(new Label{Text="适用 Windows 10 / 11 x64，DSH 0.2.1-rc.3。\r\n安装前请完全退出 DSH（包括托盘）；不匹配的版本会停止安装。",Location=new Point(28,201),Size=new Size(594,44),ForeColor=Color.FromArgb(75,82,94)});
+  Controls.Add(new Label{Text="Windows 10 / 11 x64 · DSH 0.2.1-rc.3 / rc.5（精确校验）\r\n安装前请完全退出 DSH（包括托盘）；其他版本或修改版会安全停止。",Location=new Point(28,201),Size=new Size(594,44),ForeColor=Color.FromArgb(75,82,94)});
   install=new Button{Text="备份并一键安装",Location=new Point(28,258),Size=new Size(183,42),BackColor=Color.FromArgb(27,85,222),ForeColor=Color.White,FlatStyle=FlatStyle.Flat};install.Click+=(s,e)=>Start("install");Controls.Add(install);
   restore=new Button{Text="还原安装前外壳",Location=new Point(221,258),Size=new Size(183,42)};restore.Click+=(s,e)=>Start("restore");Controls.Add(restore);
   recover=new Button{Text="修复未完成安装",Location=new Point(414,258),Size=new Size(208,42)};recover.Click+=(s,e)=>Start("recover");Controls.Add(recover);

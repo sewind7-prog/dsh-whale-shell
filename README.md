@@ -6,45 +6,22 @@ Windows 一键安装器与鲸鱼皮肤源码，包含 DS Bot 0.2.4、deep-view 0
 
 ## Windows 下载与范围
 
-[下载 1.0.2 单文件安装器](downloads/windows-1.0.2/DSH鲸鱼外壳一键安装器-1.0.2.exe) · [SHA256](downloads/windows-1.0.2/SHA256SUMS.txt)
+[下载 1.0.3 单文件安装器](downloads/windows-1.0.3/DSH鲸鱼外壳一键安装器-1.0.3.exe) · [SHA256](downloads/windows-1.0.3/SHA256SUMS.txt) · [1.0.2 历史版本](downloads/windows-1.0.2/DSH鲸鱼外壳一键安装器-1.0.2.exe)
 
-这是未做 Authenticode 签名的 Windows x64 安装器。仅接受 DSH **0.2.1-rc.3** 的以下精确 `app.asar`，不以版本文字猜测兼容性：
+这是未做 Authenticode 签名的 Windows 10/11 x64 安装器。仅接受已核验的 DSH **0.2.1-rc.3 和 0.2.1-rc.5** 原版或相应鲸鱼外壳，同时核对主程序与 ASAR 的精确散列，不以版本文字猜测兼容性。原版 ASAR：
 
-- 原版：`04b32e3a872826ba15cfb2081c6a929a8d4ecaa65e09a2543e5a6b30e2eff1f0`
-- 对应鲸鱼外壳：`e146b65f293baf9595005f56c124ce568b95c2a4ab998604be6b638528c3f318`
+- rc.3：`04b32e3a872826ba15cfb2081c6a929a8d4ecaa65e09a2543e5a6b30e2eff1f0`
+- rc.5：`e1b6f25fa937da98086c3e77af77aa14791105963c4d337a1c42179d232c6915`
 
-其他版本（包括 rc.4/rc.5）会拒绝安装。目标电脑须另行安装合法取得的 DSH。安装前退出目标 DSH 及后台任务；安装器不会强停它们。成功安装、还原或恢复检查后显示完成状态，2 秒后仅关闭安装器，不自动重启 DSH。失败保留错误和恢复入口。
+其他版本、混合版本或修改版会拒绝安装。目标电脑须另行安装合法取得的 DSH。安装前退出目标 DSH 及后台任务；安装器不会强停它们。成功安装、还原或恢复检查后显示完成状态，2 秒后仅关闭安装器，不自动重启 DSH。失败保留错误和恢复入口。
 
 保留原有 Bot、头像、草稿、聊天、其他插件、provider、模型和路由。备份在实际数据目录 `whale-shell-installer/backups/`；还原只恢复安装前外壳和皮肤，保留 DS Bot、头像与新增用户数据。不同或损坏的同版插件、自定义动态/不安全目录会安全拒绝而不覆盖。
 
-1.0.2 的 PE 图标、内嵌窗口 ICO、编译后完成/失败路径和无窗口隔离安装回归已验证；本轮没有实际 GUI 验证自动关闭与任务栏显示，也没有第二台物理电脑验收。
+1.0.3 在同机隔离副本上通过 rc.3/rc.5 安装、升级及恢复等 13 组回归；rc.5 本地宿主通过 36 张头像和鲸鱼皮肤资源检查。图标和自动关闭的编译路径已检查，实际 GUI 自动关闭、任务栏显示和第二台物理电脑仍未验收。
 
 ## 从源码构建 Windows
 
-需要 Windows x64、Node.js、Microsoft Edge、.NET Framework 4 的 C# 编译器，以及 Playwright 开发包。构建不调用模型。可使用已安装的 Playwright（设置 `NODE_PATH`），或在自己的环境安装 `package.json` 中固定的开发依赖。
-
-从仓库根目录执行 PowerShell：
-
-```powershell
-node implementation/build-skin.mjs build/client.js
-$env:DSH_SKIN_CLIENT = (Resolve-Path build/client.js).Path
-node implementation/installer/build-payload.cjs build/payload-1.0.2 vendor
-& implementation/installer/build-setup.ps1 -PayloadDirectory build/payload-1.0.2 -OutputDirectory build/windows-1.0.2
-$env:DSH_TEST_OUTPUT = Join-Path $PWD 'build/resource-check'
-node implementation/installer/test-ui-resources.cjs build/windows-1.0.2 build/payload-1.0.2
-```
-
-输出目录必须是新目录，避免替换已有构建。`build/` 为生成文件，不应提交。构建出的 EXE 可以因 ZIP 时间戳等元数据与已下载版本具有不同总散列；源码、资源和测试记录分别校验。
-
-需要真实 DSH 运行时的无窗口隔离检查时，提供自己机器上的两个只读输入：
-
-```powershell
-$env:DSH_RUNTIME_EXE = '你自己的DSH目录/DeepSeek Harness.exe'
-$env:DSH_STOCK_ASAR = '你自己的原版rc.3/app.asar'
-node implementation/installer/test-windows.cjs build/windows-1.0.2 build/payload-1.0.2
-```
-
-测试只在 `build/` 新建带标记的 fixture，DSH 运行时仅以 Electron Node 模式执行本地安装引擎，不显示客户端，不发模型请求，不读取真实聊天。不允许用用户数据目录作为 fixture。测试用 ASAR 不能提交到本仓库。
+从原素材构建需要 Windows x64、Node.js、Microsoft Edge、.NET Framework 4 的 C# 编译器，以及 `package-lock.json` 固定的开发依赖。也可从已核验的安装器离线提取资源再构建。完整命令与隔离验证方法见 [Windows 构建说明](implementation/installer/README-build.md)。构建和测试不调用模型；官方 DSH 程序及测试用户数据不提交到本仓库。
 
 ## Mac 状态
 

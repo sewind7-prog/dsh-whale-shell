@@ -1,15 +1,15 @@
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const {chromium}=require('playwright');const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
-const version='1.0.2',dir=__dirname,project=path.resolve(dir,'../..'),impl=path.dirname(dir),out=path.resolve(process.argv[2]||path.join(dir,'build','payload-'+version));
+const version='1.0.3',dir=__dirname,project=path.resolve(dir,'../..'),impl=path.dirname(dir),out=path.resolve(process.argv[2]||path.join(dir,'build','payload-'+version));
 function copy(src,dest){fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(src,dest,fs.constants.COPYFILE_EXCL);}
 (async()=>{
  if(fs.existsSync(out))throw Error('Payload already exists; use a fresh version/build directory.');fs.mkdirSync(out,{recursive:true});
- copy(path.join(dir,'src','engine.cjs'),path.join(out,'engine.cjs'));copy(path.join(impl,'patch-shell.cjs'),path.join(out,'patch-shell.cjs'));
+ for(const file of ['engine.cjs','patch-shell.cjs','supported-shells.cjs','state-policy.cjs'])copy(path.join(dir,'src',file),path.join(out,file));
  const packages=path.resolve(process.argv[3]||process.env.DSH_INSTALLER_PACKAGES||path.join(project,'vendor'));
  for(const [name,folder] of [['ds-bot','ds-bot-0.2.4'],['deep-view','deep-view-0.1.0']])fs.cpSync(path.join(packages,folder,'package'),path.join(out,'plugins',name),{recursive:true,errorOnExist:true,force:false});
  const skin=path.join(out,'plugins','dsh-ui-skin');fs.mkdirSync(path.join(skin,'lib'),{recursive:true});
  const pkg=JSON.parse(fs.readFileSync(path.join(impl,'package.json')));pkg.version=version;fs.writeFileSync(path.join(skin,'package.json'),JSON.stringify(pkg,null,2));
- copy(path.join(impl,'index.js'),path.join(skin,'lib','index.js'));const active=path.resolve(process.env.DSH_SKIN_CLIENT||path.join(project,'build','client.js'));
+ copy(path.join(impl,'index.js'),path.join(skin,'lib','index.js'));const active=process.env.DSH_SKIN_CLIENT?path.resolve(process.env.DSH_SKIN_CLIENT):fs.existsSync(path.join(project,'build/client.js'))?path.join(project,'build/client.js'):path.join(impl,'dist','shape','client-avatar-curve-exit-20261030.js');
  if(sha(fs.readFileSync(active))!=='4acc9c1ea0dbcee422c8bd6f551492d952e7d005ab5a54653157216ed5cb40d3')throw Error('Unexpected skin version');copy(active,path.join(skin,'lib','client.js'));
  copy(path.join(project,'refs','透明腹窗纸艺蓝鲸.png'),path.join(out,'art','whale.png'));
  const avatars=[],originals=[],iconDir=path.join(project,'refs','icons'),names=fs.readdirSync(iconDir).filter(n=>/^bot-\d+\.png$/.test(n)).sort((a,b)=>Number(a.match(/\d+/)[0])-Number(b.match(/\d+/)[0]));
@@ -21,6 +21,6 @@ function copy(src,dest){fs.mkdirSync(path.dirname(dest),{recursive:true});fs.cop
  }}finally{await browser.close();}
  fs.writeFileSync(path.join(out,'THIRD-PARTY-NOTICES.txt'),'DS Bot 0.2.4 and deep-view 0.1.0 are distributed under Apache-2.0. Original LICENSE and README files are included under plugins/.\nDSH itself and its full ASAR are not redistributed. The target user must have the supported DSH desktop application installed. The included patch is applied locally.\nAvatar and whale artwork: supplied in this project by the user.\n');
  const files=[];function walk(p,rel=''){for(const e of fs.readdirSync(p,{withFileTypes:true})){const next=rel?rel+'/'+e.name:e.name;if(e.isSymbolicLink())throw Error('No machine-specific symlinks in payload');if(e.isDirectory())walk(path.join(p,e.name),next);else files.push({path:next,sha256:sha(fs.readFileSync(path.join(p,e.name)))});}}walk(out);
- const manifest={version,platform:'win32',arch:'x64',dshVersion:'0.2.1-rc.3',dsBotVersion:'0.2.4',deepViewVersion:'0.1.0',skinSha256:sha(fs.readFileSync(active)),avatars,originals,files};fs.writeFileSync(path.join(out,'manifest.json'),JSON.stringify(manifest,null,2));console.log(JSON.stringify({payload:out,avatars:avatars.length,files:files.length,skinSha256:manifest.skinSha256}));
+ const manifest=require('./payload-code.cjs').sync(out,{version,platform:'win32',arch:'x64',dsBotVersion:'0.2.4',deepViewVersion:'0.1.0',skinSha256:sha(fs.readFileSync(active)),avatars,originals,files});fs.writeFileSync(path.join(out,'manifest.json'),JSON.stringify(manifest,null,2));console.log(JSON.stringify({payload:out,avatars:avatars.length,files:manifest.files.length,skinSha256:manifest.skinSha256}));
 })().catch(e=>{console.error(e);process.exitCode=1});
 function copyBytes(b,p){fs.mkdirSync(path.dirname(p),{recursive:true});if(fs.existsSync(p)){if(sha(fs.readFileSync(p))!==sha(b))throw Error('Hash collision');return;}fs.writeFileSync(p,b,{flag:'wx'});}

@@ -2,7 +2,7 @@
 
 **本候选使用独立数据目录，原有 DSH 会话、设置和 Bot 不会显示，需要重新配置。尚未支持接入现有 DSH_HOME。两种芯片的候选 App 均已通过 Mac 本地宿主的无界面验证；真实桌面交互与正式平台验收尚未完成。**
 
-候选复用已安装官方 DSH 的 Node 模式本地宿主，显示相同鲸鱼皮肤、DS Bot 和 36 张头像。自己的 Electron 窗口有独立 bundle ID、userData 和单实例锁；不运行官方桌面 lib/main.js，不修改官方 ASAR、签名、协议处理器或更新器，不注册 dsh:，不导入原 Keychain 凭据。
+候选复用已安装官方 DSH 的 Node 模式本地宿主，设计为显示相同鲸鱼皮肤、DS Bot 和 36 张头像；皮肤和头像的真实窗口展示仍待验证。自己的 Electron 窗口有独立 bundle ID、userData 和单实例锁；不运行官方桌面 lib/main.js，不修改官方 ASAR、签名、协议处理器或更新器，不注册 dsh:，不导入原 Keychain 凭据。
 
 ## 已实现与验证边界
 
