@@ -25,9 +25,9 @@ Windows 一键安装器与鲸鱼皮肤源码，包含 DS Bot 0.2.4、deep-view 0
 
 ## Mac 状态
 
-提供 [Mac 隔离候选源码与验证说明](mac-candidate/README.md)。Apple 芯片版针对官方 DSH 0.2.1-rc.5，Intel 版针对官方 DSH 0.2.1-rc.4；各自都已在 GitHub 标准 Mac runner 通过本地宿主与 36 张头像的无界面检查，并生成候选包。它们使用独立数据目录，不显示已有 DSH 会话、设置或 Bot，需要重新配置，也不会覆盖或重签官方 DSH。
+提供 [Mac 隔离候选源码与验证说明](mac-candidate/README.md)。Apple 芯片版针对官方 DSH 0.2.1-rc.5，Intel 版针对官方 DSH 0.2.1-rc.4；各自都已在 GitHub 标准 Mac runner 的基础系统路径下通过本地宿主、鲸鱼皮肤资源与 36 张头像的无界面检查，并生成候选包。它们使用独立数据目录，不显示已有 DSH 会话、设置或 Bot，需要重新配置，也不会覆盖或重签官方 DSH。
 
-候选尚未完成真实 Mac 桌面交互、透明区域点击穿透或 Gatekeeper 验收，也没有 Apple Developer ID 签名和公证。[测试运行与候选产物](https://github.com/sewind7-prog/dsh-whale-shell/actions/runs/41003158350)中的 Actions 下载保留 1 天；日后可按候选说明重新构建。
+候选尚未完成真实 Mac 桌面交互、透明区域点击穿透或 Gatekeeper 验收，也没有 Apple Developer ID 签名和公证。[测试运行与候选产物](https://github.com/sewind7-prog/dsh-whale-shell/actions/runs/41010580729)中的 Actions 下载保留 1 天；日后可按候选说明重新构建。
 
 ## 源码和许可
 
