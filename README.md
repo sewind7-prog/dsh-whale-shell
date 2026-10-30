@@ -48,9 +48,9 @@ node implementation/installer/test-windows.cjs build/windows-1.0.2 build/payload
 
 ## Mac 状态
 
-目前没有可交付或已签名/公证的 Mac 安装器。macOS 不支持此 Windows `setShape` 路径；修改官方应用 ASAR 还涉及签名、完整性、Keychain 与更新风险。Mac 工作只会使用隔离副本和独立数据目录，不覆盖或重签官方 DSH。候选、非 GUI 测试与真实 Mac 桌面验收必须分别标注。
+提供 [Mac 隔离候选源码与验证说明](mac-candidate/README.md)。Apple 芯片版针对官方 DSH 0.2.1-rc.5，Intel 版针对官方 DSH 0.2.1-rc.4；各自都已在 GitHub 标准 Mac runner 通过本地宿主与 36 张头像的无界面检查，并生成候选包。它们使用独立数据目录，不显示已有 DSH 会话、设置或 Bot，需要重新配置，也不会覆盖或重签官方 DSH。
 
-[Mac 隔离候选源码与验证说明](mac-candidate/README.md)：使用独立数据目录，暂不显示现有 DSH 会话、设置或 Bot，需重新配置。各架构的系统级测试和真正的桌面操作测试仍待完成。
+候选尚未完成真实 Mac 桌面交互、透明区域点击穿透或 Gatekeeper 验收，也没有 Apple Developer ID 签名和公证。[测试运行与候选产物](https://github.com/sewind7-prog/dsh-whale-shell/actions/runs/41003158350)中的 Actions 下载保留 1 天；日后可按候选说明重新构建。
 
 ## 源码和许可
 

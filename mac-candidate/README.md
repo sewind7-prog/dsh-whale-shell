@@ -1,6 +1,6 @@
 # Mac 0.1.0 隔离候选
 
-**本候选使用独立数据目录，原有 DSH 会话、设置和 Bot 不会显示，需要重新配置。尚未支持接入现有 DSH_HOME。目前没有通过 Mac 原生验收的可用 App；Windows 1.0.2 保持不变。**
+**本候选使用独立数据目录，原有 DSH 会话、设置和 Bot 不会显示，需要重新配置。尚未支持接入现有 DSH_HOME。两种芯片的候选 App 均已通过 Mac 本地宿主的无界面验证；真实桌面交互与正式平台验收尚未完成。**
 
 候选复用已安装官方 DSH 的 Node 模式本地宿主，显示相同鲸鱼皮肤、DS Bot 和 36 张头像。自己的 Electron 窗口有独立 bundle ID、userData 和单实例锁；不运行官方桌面 lib/main.js，不修改官方 ASAR、签名、协议处理器或更新器，不注册 dsh:，不导入原 Keychain 凭据。
 
@@ -34,5 +34,7 @@ Windows 上仅执行跨平台逻辑和 mock；POSIX 目录链接留给 Mac/Linux
 流程依次进行模块测试、官方签名/三重散列检查、Node 模式真实 web 宿主 cookie 与 36 头像 API、只停止自己进程的检查。本架构 native 报告通过后才构建该架构 App，并写入验证状态。
 
 候选包含自身 Electron 运行时，具有独立身份，仅对新 App 做本地 ad-hoc 签名。上传仅含候选 ZIP、校验和与准确说明，不含官方 DSH、日志或测试工作区。ad-hoc 不是 Developer ID，也不是公证；没有请求 Apple 凭证。Gatekeeper、真实穿透、焦点、透明窗口和关闭/后台任务交互仍待以后另行授权及验收。
+
+[2026-10-30 双架构测试运行](https://github.com/sewind7-prog/dsh-whale-shell/actions/runs/41003158350)：Apple 芯片与 Intel 芯片各有 14 项模块检查通过，真实本地宿主认证、36 张头像 API 和宿主退出检查通过。候选产物在 Actions 保留 1 天。上述结果不代表真实窗口已验收。
 
 匹配 Mac 上可设置 DSH_OFFICIAL_APP 为官方 App 路径，设置 DSH_TEST_REPORT 与 DSH_NATIVE_REPORT 指向同一新报告文件，然后 npm run test:native、npm run build:mac。native 命令不创建 BrowserWindow、不使用 GUI 自动化、不发送模型请求，不能冒充桌面通过。
