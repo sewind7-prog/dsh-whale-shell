@@ -50,6 +50,8 @@ node implementation/installer/test-windows.cjs build/windows-1.0.2 build/payload
 
 目前没有可交付或已签名/公证的 Mac 安装器。macOS 不支持此 Windows `setShape` 路径；修改官方应用 ASAR 还涉及签名、完整性、Keychain 与更新风险。Mac 工作只会使用隔离副本和独立数据目录，不覆盖或重签官方 DSH。候选、非 GUI 测试与真实 Mac 桌面验收必须分别标注。
 
+[Mac 隔离候选源码与验证说明](mac-candidate/README.md)：使用独立数据目录，暂不显示现有 DSH 会话、设置或 Bot，需重新配置。各架构的系统级测试和真正的桌面操作测试仍待完成。
+
 ## 源码和许可
 
 `implementation/` 为皮肤、精确版本外壳补丁与 Windows 打包器；`refs/` 为原鲸鱼和 36 张头像；`vendor/` 为离线第三方运行源码。项目自有代码和素材按 MIT，DS Bot/deep-view 保留 Apache-2.0。详见 [LICENSE](LICENSE)、[NOTICE](NOTICE) 和 [第三方说明](THIRD_PARTY_NOTICES.md)。

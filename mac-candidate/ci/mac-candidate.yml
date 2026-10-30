@@ -1,0 +1,49 @@
+name: Mac isolated candidate (manual, no GUI)
+on:
+  workflow_dispatch:
+    inputs:
+      architecture:
+        description: Native architecture to verify
+        type: choice
+        default: arm64
+        options: [arm64, x64, both]
+permissions:
+  contents: read
+jobs:
+  native-and-package:
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(inputs.architecture == 'both' && '[{"arch":"arm64","runner":"macos-15"},{"arch":"x64","runner":"macos-15-intel"}]' || inputs.architecture == 'arm64' && '[{"arch":"arm64","runner":"macos-15"}]' || '[{"arch":"x64","runner":"macos-15-intel"}]') }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: mac-candidate
+    env:
+      EXPECTED_ARCH: ${{ matrix.arch }}
+      DSH_TEST_REPORT: ${{ github.workspace }}/mac-candidate/results/native-report.json
+      DSH_NATIVE_REPORT: ${{ github.workspace }}/mac-candidate/results/native-report.json
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+      - run: node scripts/check-runner.cjs
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm test
+      - name: Download verified official input outside repository
+        env:
+          DSH_OFFICIAL_INPUT_ROOT: ${{ runner.temp }}/dsh-official-input
+        run: node scripts/acquire-official.cjs
+      - name: Native local host, 36 avatars, owned-process shutdown (no window)
+        run: npm run test:native
+      - name: Package this architecture only after native acceptance
+        run: npm run build:mac
+      - name: Upload own candidate App and checks only
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: DSH-Whale-Mac-${{ matrix.arch }}-candidate
+          path: mac-candidate/build/artifacts/
+          if-no-files-found: error
+          retention-days: 1

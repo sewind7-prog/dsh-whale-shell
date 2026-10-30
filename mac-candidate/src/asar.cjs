@@ -1,0 +1,5 @@
+'use strict';
+const fs=require('node:fs');
+function openAsar(file){const fd=fs.openSync(file,'r');try{const pre=Buffer.alloc(16);fs.readSync(fd,pre,0,16,0);const length=pre.readUInt32LE(12);if(length<2||length>32*1024*1024)throw Error('Invalid ASAR header');const header=Buffer.alloc(length);fs.readSync(fd,header,0,length,16);return{file,header:JSON.parse(header),bodyOffset:8+pre.readUInt32LE(4)};}finally{fs.closeSync(fd);}}
+function entry(archive,name){if(name.split('/').some(p=>!p||p==='..'||p==='.'||p.includes('\\')))throw Error('Invalid ASAR entry');const value=name.split('/').reduce((at,key)=>at?.files?.[key],archive.header);if(!value||value.unpacked||value.link||!Number.isSafeInteger(value.size))throw Error('Missing or external ASAR entry: '+name);const buffer=Buffer.alloc(value.size),fd=fs.openSync(archive.file,'r');try{if(fs.readSync(fd,buffer,0,buffer.length,archive.bodyOffset+Number(value.offset))!==buffer.length)throw Error('Truncated ASAR entry');return buffer;}finally{fs.closeSync(fd);}}
+module.exports={openAsar,entry};

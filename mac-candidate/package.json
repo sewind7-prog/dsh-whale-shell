@@ -1,0 +1,12 @@
+{
+  "name": "dsh-whale-mac-candidate",
+  "productName": "DSH Whale Candidate",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Unsigned isolated macOS candidate; does not modify official DSH",
+  "license": "MIT",
+  "main": "src/main.cjs",
+  "scripts": {"test":"node --test test/*.test.cjs","build:mac":"node scripts/build-mac.cjs","test:native":"node scripts/native-smoke.cjs"},
+  "config": {"electronVersion":"45.1.0"},
+  "devDependencies": {"@electron/packager":"20.3.0"}
+}

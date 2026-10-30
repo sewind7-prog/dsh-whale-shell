@@ -1,0 +1,9 @@
+node_modules/
+build/
+results/
+*.log
+*.tmp
+.DS_Store
+.env
+.env.*
+official-input/

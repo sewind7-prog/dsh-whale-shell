@@ -1,0 +1,10 @@
+'use strict';
+const {contextBridge,ipcRenderer}=require('electron');
+if(process.isMainFrame){
+ const invoke=(action,payload)=>ipcRenderer.invoke('dsh-whale-mac:window',action,payload);
+ contextBridge.exposeInMainWorld('dshWindow',{minimize:()=>invoke('minimize'),toggleMaximize:()=>invoke('toggleMaximize'),close:()=>invoke('close'),isMaximized:()=>invoke('state'),beginMove:()=>invoke('beginMove'),move:()=>invoke('move'),endMove:()=>invoke('endMove'),setShape:value=>invoke('shape',value),onMaximizedChange:listener=>{if(typeof listener!=='function')throw TypeError('Expected listener');const fn=(_event,value)=>listener(value===true);ipcRenderer.on('dsh-whale-mac:maximized',fn);return()=>ipcRenderer.off('dsh-whale-mac:maximized',fn);}});
+ window.addEventListener('mousemove',event=>ipcRenderer.send('dsh-whale-mac:pointer',{x:event.clientX,y:event.clientY}),{capture:true,passive:true});
+ const openTrustedLink=event=>{if(!event.isTrusted||!['click','auxclick'].includes(event.type)||![0,1].includes(event.button))return;const anchor=event.composedPath().find(node=>node&&node.tagName==='A'&&node.href);if(!anchor)return;let url;try{url=new URL(anchor.href,location.href);}catch{return;}if(!['http:','https:'].includes(url.protocol)||url.username||url.password)return;if(url.origin===location.origin&&anchor.target!=='_blank')return;event.preventDefault();ipcRenderer.send('dsh-whale-mac:external-link',url.href);};
+ document.addEventListener('click',openTrustedLink,{capture:true});document.addEventListener('auxclick',openTrustedLink,{capture:true});
+ window.addEventListener('DOMContentLoaded',()=>{const note=document.createElement('div');note.textContent='Mac 隔离候选 · 不显示原有会话和设置，需要重新配置';note.setAttribute('role','status');note.style.cssText='position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:2147483647;padding:5px 12px;border-radius:12px;background:#173a70;color:white;font:12px system-ui;white-space:nowrap;pointer-events:none';document.body.appendChild(note);},{once:true});
+}
