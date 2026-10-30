@@ -14,9 +14,9 @@ function stopper(child,grouped,{timeoutMs=10000,pollMs=150}={}){let pending;cons
  }
  throw Error('Candidate host shutdown incomplete: '+remaining.length+' owned/tracked processes remain. No unrelated DSH was signaled.');
 };return()=>{if(!pending)pending=attempt().catch(error=>{pending=undefined;throw error;});return pending;};}
-function start(official,home){
+function start(official,home,{finderPath=false}={}){
  const grouped=process.platform==='darwin';
- const child=spawn(official.executable,args(official),{env:childEnv(home),cwd:home,detached:grouped,stdio:['ignore','pipe','pipe'],windowsHide:true});
+ const child=spawn(official.executable,args(official),{env:childEnv(home,process.env,{finderPath}),cwd:home,detached:grouped,stdio:['ignore','pipe','pipe'],windowsHide:true});
  const stop=stopper(child,grouped);let stdout='',stderr='',settled=false;
  const ready=new Promise((resolve,reject)=>{
   const fail=error=>{if(settled)return;settled=true;clearTimeout(timer);stop().catch(()=>{});reject(error);};
@@ -27,5 +27,4 @@ function start(official,home){
  });
  return{child,ready,stop};
 }
-async function avatarView(boot){const url=localUrl(boot),response=await fetch(url,{redirect:'manual'});if(response.status!==303)throw Error('Expected DSH native launch-token exchange');const cookies=response.headers.getSetCookie().map(c=>c.split(';')[0]).join('; ');if(!cookies)throw Error('Native session cookie missing');const api=await fetch(new URL('/api/bot',url),{method:'POST',headers:{Cookie:cookies,Origin:url.origin,'Content-Type':'application/json'},body:JSON.stringify({endpoint:'avatar-library',payload:{limit:48}})});if(!api.ok)throw Error('Avatar API HTTP '+api.status);const body=await api.json();if(!body.ok||body.value?.total!==36||body.value.items.length!==36||!body.value.items.every(a=>a.image.startsWith('data:image/webp;base64,')))throw Error('Native host avatar API did not return the 36 seeded images');return{total:36,nativeSessionAuthenticated:true};}
-module.exports={start,args,avatarView,stopper};
+module.exports={start,args,stopper};

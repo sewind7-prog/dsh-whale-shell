@@ -1,13 +1,14 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),{execFileSync}=require('node:child_process');
 const {pathToFileURL}=require('node:url'),{serializeError,traceDownloader}=require('./download-diagnostics.cjs');
-const {SUPPORTED,INSPECTED_INTEL,inside}=require('../src/policy.cjs');
+const {SUPPORTED,INSPECTED_INTEL,inside,FINDER_PATH}=require('../src/policy.cjs');
 const copy=(a,b)=>{const s=fs.lstatSync(a);if(s.isSymbolicLink())throw Error('Source links not allowed');if(s.isDirectory()){fs.mkdirSync(b);for(const n of fs.readdirSync(a))copy(path.join(a,n),path.join(b,n));}else fs.copyFileSync(a,b,fs.constants.COPYFILE_EXCL);};
 (async()=>{
  if(process.platform!=='darwin'||!['arm64','x64'].includes(process.arch))throw Error('Build on a matching standard macOS runner');
  const root=path.resolve(__dirname,'..'),out=path.join(root,'build');if(fs.existsSync(out))throw Error('Use a fresh build directory');
  const native=JSON.parse(fs.readFileSync(process.env.DSH_NATIVE_REPORT||path.join(root,'results/native-report.json'))),spec=SUPPORTED[process.arch]||INSPECTED_INTEL;
- if(native.status!=='PASS'||native.arch!==process.arch||native.officialAsarSha256!==spec.asarSha256||native.nativeLocalHostAndAvatarAPI?.total!==36||!native.officialAppSignaturePreserved)throw Error('Matching native host acceptance must pass before packaging this architecture');
+ const installedSkin=path.join(root,'payload/plugins/dsh-ui-skin/lib/client.js'),skinHash=crypto.createHash('sha256').update(fs.readFileSync(installedSkin)).digest('hex');
+ if(native.status!=='PASS'||native.arch!==process.arch||native.officialAsarSha256!==spec.asarSha256||native.nativeLocalHostAndAvatarAPI?.total!==36||!native.officialAppSignaturePreserved||native.nativeHostFinderPath!==true||native.nativeHostPath!==FINDER_PATH||!native.nativeLocalHostAndAvatarAPI?.nativeComboContainsExactSkinSource||native.nativeLocalHostAndAvatarAPI?.skinSourceSha256!==skinHash)throw Error('Matching native host, Finder PATH and skin-source acceptance must pass before packaging this architecture');
  fs.mkdirSync(out);const source=path.join(out,'app-source');fs.mkdirSync(source);
  // Only our code/assets and offline plugins. Official inputs and test data cannot enter the App.
  for(const name of ['src','payload','assets','package.json','LICENSE','THIRD_PARTY_NOTICES.md','third_party'])copy(path.join(root,name),path.join(source,name));
