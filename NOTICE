@@ -1,0 +1,7 @@
+DSH Whale Shell
+Project code and supplied artwork: MIT, see LICENSE.
+Contains DS Bot 0.2.4 and deep-view 0.1.0: Apache-2.0.
+Original upstream licenses and attribution are retained in vendor/.
+Does not include DeepSeek Harness or any user's configuration or conversations.
+Patch matching fragments: Copyright (c) 2026 DeepSeek, MIT.
+See third_party/deepseek-harness/LICENSE for the complete original license.

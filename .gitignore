@@ -1,0 +1,14 @@
+/build/
+**/build/
+**/dist/
+node_modules/
+*.log
+*.tmp
+.env
+.env.*
+!.env.example
+.DS_Store
+.dsh/
+.version-guard/
+coverage/
+test-results/

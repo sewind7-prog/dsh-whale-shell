@@ -1,0 +1,12 @@
+# Strict skin hashes must survive Windows checkout settings.
+* text=auto eol=lf
+
+# Preserve the upstream package bytes, licenses and original whitespace.
+vendor/** -text
+
+# Original artwork and the checked download are never text-normalized.
+*.png -text
+*.webp -text
+*.ico -text
+*.exe -text
+*.zip -text

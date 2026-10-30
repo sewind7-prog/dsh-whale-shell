@@ -1,0 +1,21 @@
+{
+  "name": "dsh-ui-skin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pure-CSS visual skin for the DSH Web GUI (no host logic, no data changes)",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js"
+  },
+  "files": [
+    "lib/index.js",
+    "lib/client.js"
+  ],
+  "dsh": {
+    "client": {
+      "platform": "web"
+    }
+  }
+}

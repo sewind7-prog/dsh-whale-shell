@@ -1,0 +1,468 @@
+{
+  "name": "whale-paper-ui",
+  "version": "1.1.0",
+  "created_date": "2026-10-29",
+  "base_path": ".",
+  "canvas": {
+    "width": 1448,
+    "height": 1086
+  },
+  "bot_export": {
+    "width": 256,
+    "height": 256,
+    "minimum_transparent_margin_px": 21,
+    "minimum_safe_margin_percent": 8,
+    "name_pattern": "icons/bot-01.png ... icons/bot-10.png"
+  },
+  "layers_bottom_to_top": [
+    {
+      "asset": "chat-paper",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "runtime": "chat_content_and_input",
+      "mask": "chat-clip",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "asset": "whale-shell",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "runtime": "bot_and_control_icons"
+    }
+  ],
+  "chat_hole_bbox": [
+    350,
+    338,
+    1285,
+    952
+  ],
+  "assets": {
+    "whale-shell": {
+      "kind": "shell",
+      "label": "鲸鱼镂空外壳",
+      "path": "透明腹窗纸艺蓝鲸.png",
+      "width": 1448,
+      "height": 1086,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1448,
+        "height": 1086
+      },
+      "file_bytes": 1213237,
+      "sha256": "9af9134cec2a17264417beede3204f30083637aac9a9242604e4d0619caa7ade"
+    },
+    "chat-paper": {
+      "kind": "paper",
+      "label": "独立聊天纸面",
+      "path": "chat-paper.png",
+      "width": 1448,
+      "height": 1086,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 342,
+        "y": 330,
+        "width": 951,
+        "height": 630
+      },
+      "file_bytes": 575765,
+      "sha256": "4480cbe51d2808cec177e3353e562a21b5749fe6e9dc5eace8864895db2de828"
+    },
+    "chat-clip": {
+      "kind": "mask",
+      "label": "聊天区裁切蒙版",
+      "path": "chat-clip.png",
+      "width": 1448,
+      "height": 1086,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 349,
+        "y": 338,
+        "width": 937,
+        "height": 615
+      },
+      "file_bytes": 33180,
+      "sha256": "8bd2d6af58f88538ccd6555d91d76d2abccd6a1ea621991c1115742c5ea699ed"
+    },
+    "bot-01": {
+      "kind": "bot",
+      "label": "星星",
+      "path": "icons/bot-01.png",
+      "width": 256,
+      "height": 256,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 21,
+        "y": 23,
+        "width": 214,
+        "height": 210
+      },
+      "file_bytes": 65534,
+      "sha256": "8e7a10ab8742df915cdd91dab60c1c3dca8124c3720d17cefe8133f0c773a1a3",
+      "transparent_margin_px": [
+        21,
+        23,
+        21,
+        23
+      ],
+      "source_character": "star"
+    },
+    "bot-02": {
+      "kind": "bot",
+      "label": "幽灵",
+      "path": "icons/bot-02.png",
+      "width": 256,
+      "height": 256,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 26,
+        "y": 21,
+        "width": 203,
+        "height": 214
+      },
+      "file_bytes": 73283,
+      "sha256": "1ee061e04093895e74e253efcef54c934db25d9fc2bd35d8e60c6da0ac85dc05",
+      "transparent_margin_px": [
+        26,
+        21,
+        27,
+        21
+      ],
+      "source_character": "ghost"
+    },
+    "bot-03": {
+      "kind": "bot",
+      "label": "软方块",
+      "path": "icons/bot-03.png",
+      "width": 256,
+      "height": 256,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 21,
+        "y": 28,
+        "width": 214,
+        "height": 200
+      },
+      "file_bytes": 70079,
+      "sha256": "a84a53a2c4629a02fb3e3f871077f9d450201132716e8be77589cd81259a1b9f",
+      "transparent_margin_px": [
+        21,
+        28,
+        21,
+        28
+      ],
+      "source_character": "squircle"
+    },
+    "bot-04": {
+      "kind": "bot",
+      "label": "月亮",
+      "path": "icons/bot-04.png",
+      "width": 256,
+      "height": 256,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 21,
+        "y": 28,
+        "width": 214,
+        "height": 199
+      },
+      "file_bytes": 63786,
+      "sha256": "89d7a6c5384ed5b69ca695989b2f771a093912faae9bfd2d20fc51118c8841b8",
+      "transparent_margin_px": [
+        21,
+        28,
+        21,
+        29
+      ],
+      "source_character": "moon"
+    },
+    "bot-05": {
+      "kind": "bot",
+      "label": "鲸鱼",
+      "path": "icons/bot-05.png",
+      "width": 256,
+      "height": 256,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 21,
+        "y": 62,
+        "width": 214,
+        "height": 131
+      },
+      "file_bytes": 41009,
+      "sha256": "6cad4a5e2f3a3f2c64965824b23672d8182db10906c7f4fd063b61be75f04855",
+      "transparent_margin_px": [
+        21,
+        62,
+        21,
+        63
+      ],
+      "source_character": "whale"
+    },
+    "bot-06": {
+      "kind": "bot",
+      "label": "机器人",
+      "path": "icons/bot-06.png",
+      "width": 256,
+      "height": 256,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 21,
+        "y": 23,
+        "width": 214,
+        "height": 210
+      },
+      "file_bytes": 56473,
+      "sha256": "1f9c4f2b6260add03de18d4f6e93e25e38427df291a81a9e05a5d3589e8d40ee",
+      "transparent_margin_px": [
+        21,
+        23,
+        21,
+        23
+      ],
+      "source_character": "robot"
+    },
+    "bot-07": {
+      "kind": "bot",
+      "label": "花朵",
+      "path": "icons/bot-07.png",
+      "width": 256,
+      "height": 256,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 21,
+        "y": 21,
+        "width": 214,
+        "height": 214
+      },
+      "file_bytes": 74287,
+      "sha256": "037d330392bd63c2d160bbd059a8332bd56419c4059dd7d9d950e4606e2172c9",
+      "transparent_margin_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "source_character": "flower"
+    },
+    "bot-08": {
+      "kind": "bot",
+      "label": "叶片",
+      "path": "icons/bot-08.png",
+      "width": 256,
+      "height": 256,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 30,
+        "y": 21,
+        "width": 195,
+        "height": 214
+      },
+      "file_bytes": 65259,
+      "sha256": "e0fcdc74a0d5bb5deeed14173cdb14bff85b0423e402d2f693ebdc7ff22a1b40",
+      "transparent_margin_px": [
+        30,
+        21,
+        31,
+        21
+      ],
+      "source_character": "leaf"
+    },
+    "bot-09": {
+      "kind": "bot",
+      "label": "云朵",
+      "path": "icons/bot-09.png",
+      "width": 256,
+      "height": 256,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 21,
+        "y": 51,
+        "width": 214,
+        "height": 153
+      },
+      "file_bytes": 48963,
+      "sha256": "2b694623763e636f3a6fae0c3f606856f97f8172c917bc77294bc4515ac4c129",
+      "transparent_margin_px": [
+        21,
+        51,
+        21,
+        52
+      ],
+      "source_character": "cloud"
+    },
+    "bot-10": {
+      "kind": "bot",
+      "label": "火箭",
+      "path": "icons/bot-10.png",
+      "width": 256,
+      "height": 256,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 25,
+        "y": 21,
+        "width": 206,
+        "height": 214
+      },
+      "file_bytes": 60794,
+      "sha256": "3d7701c6dfc7dded770e8897d221c15e457198142b3f070ee54a2b64f3eed86a",
+      "transparent_margin_px": [
+        25,
+        21,
+        25,
+        21
+      ],
+      "source_character": "rocket"
+    },
+    "menu-app": {
+      "kind": "control",
+      "label": "应用",
+      "path": "icons/menu-app.png",
+      "width": 1254,
+      "height": 1254,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 138,
+        "y": 460,
+        "width": 976,
+        "height": 379
+      },
+      "file_bytes": 534128,
+      "sha256": "bf0d949591d9a5761997add5ab9b389cc3bf4e9a754f81f18d8433db6a76f4f5"
+    },
+    "menu-edit": {
+      "kind": "control",
+      "label": "编辑",
+      "path": "icons/menu-edit.png",
+      "width": 1254,
+      "height": 1254,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 136,
+        "y": 458,
+        "width": 982,
+        "height": 386
+      },
+      "file_bytes": 473876,
+      "sha256": "4388136e783077088de9c5bd7e6a2b76f7bb2aefabbf3ca99c6d0873b19f7d8b"
+    },
+    "window-minimize": {
+      "kind": "control",
+      "label": "最小化",
+      "path": "icons/window-minimize.png",
+      "width": 1254,
+      "height": 1254,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 263,
+        "y": 292,
+        "width": 730,
+        "height": 694
+      },
+      "file_bytes": 690204,
+      "sha256": "aa689b5854d53c924d85355413d63b8f3ca06e7d4178cc055d1807671faf9a82"
+    },
+    "window-maximize": {
+      "kind": "control",
+      "label": "最大化",
+      "path": "icons/window-maximize.png",
+      "width": 1254,
+      "height": 1254,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 257,
+        "y": 292,
+        "width": 740,
+        "height": 697
+      },
+      "file_bytes": 590808,
+      "sha256": "15a1ab249eafe059f4028777ec9727335d0962eec959f9a4daa2806f22607601"
+    },
+    "window-close": {
+      "kind": "control",
+      "label": "关闭",
+      "path": "icons/window-close.png",
+      "width": 1254,
+      "height": 1254,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 255,
+        "y": 291,
+        "width": 744,
+        "height": 699
+      },
+      "file_bytes": 589567,
+      "sha256": "1b9c5faa76ff79bb1fd4c23ef98408deddb6abf333c802e045e40772191e7323"
+    },
+    "input-add": {
+      "kind": "control",
+      "label": "添加",
+      "path": "icons/input-add.png",
+      "width": 1254,
+      "height": 1254,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 214,
+        "y": 224,
+        "width": 826,
+        "height": 833
+      },
+      "file_bytes": 940222,
+      "sha256": "edb82697442393872223adc62f31bdeba54e5b0f9d9bfea569d721ba41d036df"
+    },
+    "input-microphone": {
+      "kind": "control",
+      "label": "麦克风",
+      "path": "icons/input-microphone.png",
+      "width": 1254,
+      "height": 1254,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 325,
+        "y": 158,
+        "width": 605,
+        "height": 989
+      },
+      "file_bytes": 551377,
+      "sha256": "df3680f2680682ccdce4e8cc952f58c3422a9bea8947d7a460e46a193dcc2cf1"
+    },
+    "input-stop": {
+      "kind": "control",
+      "label": "停止",
+      "path": "icons/input-stop.png",
+      "width": 1254,
+      "height": 1254,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 157,
+        "y": 171,
+        "width": 939,
+        "height": 952
+      },
+      "file_bytes": 1192881,
+      "sha256": "aa0cbcca3738e690bf0bf7b75d859684e1446488ace18b713a5e4b50246e5df8"
+    },
+    "thinking-dots": {
+      "kind": "control",
+      "label": "思考三点",
+      "path": "icons/thinking-dots.png",
+      "width": 2172,
+      "height": 724,
+      "has_alpha": true,
+      "content_bounds": {
+        "x": 234,
+        "y": 158,
+        "width": 1703,
+        "height": 421
+      },
+      "file_bytes": 796331,
+      "sha256": "d9efd2de29fc936c2a91b10ff85e92d1c21ee7a1434a279789aa9550942b1ee7"
+    }
+  }
+}

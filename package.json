@@ -1,0 +1,14 @@
+{
+  "name": "dsh-whale-shell",
+  "version": "1.0.2",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build:skin": "node implementation/build-skin.mjs build/client.js",
+    "build:payload": "node implementation/installer/build-payload.cjs build/payload-1.0.2 vendor",
+    "test:windows": "node implementation/installer/test-windows.cjs build/windows-1.0.2 build/payload-1.0.2"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}
